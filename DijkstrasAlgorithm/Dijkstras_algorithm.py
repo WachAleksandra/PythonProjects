@@ -2,23 +2,30 @@ import networkx as nx
 import matplotlib.pyplot as plt
 from queue import PriorityQueue
 
+#program reads a graph from a text file where the first line contains four numbers separated by spaces and denoting sequentially
+#number of vertices in the graph, number of edges in the graph, starting vertex number, end vertex number.
+
+#We assume that the vertices are numbered with natural numbers from 0 to v-1, so s and k are numbers from this range.
+#Next lines contain descriptions of the edges, each of them consists of a sequence of natural numbers, separated by spaces. The following numbers mean:
+#the number of the vertex from which the edge exits, the number of the vertex into which the edge enters, the weight of the edge.
+
 def read_graph(file_name):
     with open(file_name, 'r') as f:
-        v, e, s, k = map(int, f.readline().split())
-        G = {i: set() for i in range(v)}
+        num_vertices, num_edges, start, end = map(int, f.readline().split())
+        G = {i: set() for i in range(num_vertices)}
         D = nx.DiGraph() 
         for line in f:
-            u, v, w = map(int, line.split())
-            G[u].add((v, w))
-            D.add_edge(u, v, weight=w) 
-    return G, s, k, D
+            vertex_extit, vertex_enter, weigh = map(int, line.split())
+            G[vertex_extit].add((vertex_enter, weigh))
+            D.add_edge(vertex_extit, vertex_enter, weight=weigh) 
+    return G, start, end, D
 
-def dijkstra(G, s, k):
+def dijkstra(G, start, end):
     visited = set()
-    cost = {s: 0}
-    parent = {s: None}
+    cost = {start: 0}
+    parent = {start: None}
     todo = PriorityQueue()
-    todo.put((0, s))
+    todo.put((0, start))
     try:
         while todo:
             while not todo.empty():
@@ -28,7 +35,7 @@ def dijkstra(G, s, k):
             else: 
                 break 
             visited.add(vertex)
-            if vertex == k:
+            if vertex == end:
                 break
             if G[vertex]:
                 for neighbor, distance in G[vertex]:
@@ -39,30 +46,30 @@ def dijkstra(G, s, k):
                         todo.put((new_cost, neighbor))
                         cost[neighbor] = new_cost
                         parent[neighbor] = vertex
-        print("The shortest path is:", cost[k])
+        print("The shortest path is:", cost[end])
         return parent
     except KeyError:
             print("Path does not exist.")
             return parent
     
-def make_path(parent, k):
-    if k not in parent:
+def make_path(parent, end):
+    if end not in parent:
         return None
-    v = k
+    v = end
     path = []
     while v is not None:
         path.append(v)
         v = parent[v]
     return path[::-1]
 
-def show_wpath(D, s, k,custom_node_positions=None):
+def show_wpath(D, start, end,custom_node_positions=None):
     if custom_node_positions==None:
         pos = nx.spring_layout(D)
     else:
         pos=custom_node_positions
     
     weight_labels = nx.get_edge_attributes(D,'weight')
-    path = nx.dijkstra_path(D, source = s, target = k)
+    path = nx.dijkstra_path(D, source = start, target = end)
 
     edges_path = list(zip(path,path[1:])) #creating a list of edges
     edges_path_reversed = [(y,x) for (x,y) in edges_path]
@@ -92,9 +99,9 @@ pos_node = {0:(1,2),1:(2,3),2:(2,1),3:(10,3),4:(4,3),5:(5,1), 6:(6,2), 7:(7,3), 
 
 if __name__ == '__main__':
     file_name = 'example_graph.txt'
-    G, s, k, D = read_graph(file_name)
-    parent = dijkstra(G, s, k)
-    path = make_path(parent, k)
+    G, start, end, D = read_graph(file_name)
+    parent = dijkstra(G, start, end)
+    path = make_path(parent, end)
     print(path)
-    show_wpath(D,s,k,pos_node)
+    show_wpath(D,start, end,pos_node)
     plt.savefig("example_graph.png")
