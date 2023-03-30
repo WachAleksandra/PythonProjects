@@ -21,4 +21,4 @@ The chain method
 
 Open linear addressing
 
-[Link to the project](./DijkstrasAlgorithm/Open_addressing.py)
+[Link to the project](./HashTables/Open_addressing.py)
