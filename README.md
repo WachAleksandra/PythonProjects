@@ -17,8 +17,8 @@ The following programs implement dictionaries that use hashing and solve the col
 
 The chain method 
 
-[Link to the project](./DijkstrasAlgorithm)
+[Link to the project](./HashTables/Chaining_method_in_hashing.py)
 
 Open linear addressing
 
-[Link to the project](./DijkstrasAlgorithm)
+[Link to the project](./DijkstrasAlgorithm/Open_addressing.py)
